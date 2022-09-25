@@ -1,7 +1,9 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js'
 import SlashCommand from '../classes/SlashCommand.js'
+import VerifyTicketHandler from '../classes/VerifyTicketHandler.js'
 
-const ticketsChannelId = '987230161764225044' // Elise Test Server test channel
+// const ticketsChannelId = '987230161764225044' // Elise Test Server test channel
+const { ticketsChannelId } = VerifyTicketHandler
 const leaveArchiveMessage = 'User left - archiving thread'
 
 /**
@@ -28,26 +30,16 @@ class SimulateLeave extends SlashCommand {
      * @param {Interaction} interaction The interaction that was emitted when this slash command was executed
      */
     async run(interaction) {
-        // get the channel that contains the ticket threads
-        const ticketsChannel = this.client.channels.cache.get(ticketsChannelId)
 
-        // find all threads that have the user's id as a space-delineated substring in the title
         // const userId = guildMember.user.id
-        const userId = '1000178761469268158' // TODO: this is for testing, change it back
-        await ticketsChannel.threads.fetchArchived() // brings uncached threads into the cache. n.b. this returns all archived threads as well
-        const channelThreads = ticketsChannel.threads.cache // TODO: determine if this correctly fetches all the threads
-        const matchingTicketThreads = channelThreads.filter(thread => thread.name.split(' ').includes(userId))
+        const userId = '1000178761469268158' // FIXME
 
-        // find the most recently created of all the user's tickets (since it is possible for users to create multiple tickets)
-        const mostRecentTimestamp = Math.max(...matchingTicketThreads.map((thread) => {
-            return thread.createdTimestamp
-        }))
-        const threadToArchive = matchingTicketThreads.find((thread) => {
-            return thread.createdTimestamp == mostRecentTimestamp
-        })
+        const ticketHandler = new VerifyTicketHandler(this.client)
+        const matchingTicketThreads = await ticketHandler.findAllUserTicketThreads(userId)
+        const threadToArchive = await ticketHandler.findMostRecentThread(matchingTicketThreads)
 
         // send message and archive the thread
-        // await threadToArchive.send(leaveArchiveMessage)
+        // await threadToArchive.send(leaveArchiveMessage) // FIXME
         // await threadToArchive.setArchived(true)
         const embed = new EmbedBuilder()
         embed.setDescription(`Closed thread <#${threadToArchive.id}> (${threadToArchive.id})`)
