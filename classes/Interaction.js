@@ -2,7 +2,11 @@
  * Parent class all Interactions. Subclasses should have a run() function, which is called when
  * the command is ran
  */
- class Interaction {
+class Interaction {
+    // fields
+    client
+    name
+
     /**
      * Constructor for class Interaction
      * 

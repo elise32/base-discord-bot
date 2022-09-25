@@ -3,6 +3,11 @@
  * event is triggered
  */
 class Event {
+    // fields
+    client
+    name
+    #listener
+
     /**
      * Constructor for class Event
      * 
@@ -12,7 +17,7 @@ class Event {
     constructor(client, name) {
         this.client = client
         this.name = name
-        this._listener = this.#run.bind(this)
+        this.#listener = this.#run.bind(this)
     }
 
     /**
@@ -33,14 +38,14 @@ class Event {
      * call the _listener function specified earlier
      */
     startListener() {
-        this.client.on(this.name, this._listener)
+        this.client.on(this.name, this.#listener)
     }
 
     /**
      * Same as startListener(), but with client.off
      */
     stopListener() {
-        this.client.off(this.name, this._listener)
+        this.client.off(this.name, this.#listener)
     }
 
 }

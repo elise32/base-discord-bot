@@ -6,7 +6,7 @@ import Interaction from '../classes/Interaction.js'
  */
 class SlashCommand extends Interaction {
     // fields
-    data // the data used to register a slash command
+    data // the data used to register this slash command
 
     /**
      * Constructor for class SlashCommand
