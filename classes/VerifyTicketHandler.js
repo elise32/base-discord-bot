@@ -31,7 +31,7 @@ class VerifyTicketHandler {
 
 
     /**
-     * Retrieves all archived threads within the tickets channel and loads all of the archived channels into the cache in the process
+     * Retrieves all archived threads within the tickets channel and loads all of the archived channels into the cache in the process.
      * 
      * @returns All archived threads within the ticket channel
      */
@@ -40,7 +40,7 @@ class VerifyTicketHandler {
     }
 
     /**
-     * Gets all threads belonging to this channel
+     * Gets all threads belonging to this channel.
      * 
      * @returns All threads in the given BaseChannel
      */
@@ -50,7 +50,7 @@ class VerifyTicketHandler {
     }
 
     /**
-     * Finds all threads that have the user's id as a space-delineated substring in the title. Useful because it is possible for users to create multiple tickets
+     * Finds all threads that have the user's id as a space-delineated substring in the title. Useful because it is possible for users to create multiple tickets.
      * 
      * @param {Snowflake} userId The ID of the user who the tickets belong to
      * @returns All threads that are tickets belonging to the given user
@@ -75,6 +75,15 @@ class VerifyTicketHandler {
         })
 
         return mostRecentThread
+    }
+
+    /**
+     * Checks if the given channel is a verification ticket thread. The conditions evaluated are if the channel is a thread and the thread's parent is the tickets channel.
+     * @param {BaseChannel} channel The channel to check
+     * @returns True if the given channel is a verification ticket thread, false if it is not
+     */
+    isVerificationTicket(channel) {
+        return channel.isThread() && channel.parent === this.ticketsChannel
     }
 }
 
