@@ -39,7 +39,7 @@ class Bot extends Client {
      *     registered globally if unspecified
      */
     async start(token, { registerCommands = false, clean = false, guildId = null } = {}) {
-        // init
+        // load files
         await Promise.all([
             loadSlashCommands(this.#slashCommands).then(async () => {
                 await loadSubcommands(this.#slashCommands);
@@ -59,6 +59,7 @@ class Bot extends Client {
             await registerApplicationCommands(this.#slashCommands.concat(this.#contextMenuCommands), guildId);
         }
 
+        // login
         await super.login(token);
     }
 
