@@ -23,7 +23,7 @@ class DisplayAvatar extends ContextMenuCommand {
 
     /**
      * Method to run when this context menu command is executed
-     * @param {ContextMenuCommandInteraction} interaction The interaction that was emitted when this command was
+     * @param {UserContextMenuCommandInteraction} interaction The interaction that was emitted when this command was
      *     executed
      */
     async run(interaction) {
