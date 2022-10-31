@@ -27,7 +27,10 @@ class ModalButton extends Button {
      * @param {ButtonInteraction} interaction The interaction that was emitted when this slash command was executed
      */
     async run(interaction) {
-        await interaction.showModal(interaction.client.getModal('myFirstModal'));
+        const modalInteraction = await interaction.client.getModal('myFirstModal').show(interaction, true);
+        const favoriteColor = modalInteraction.fields.getTextInputValue('favoriteColorInput');
+        const hobbies = modalInteraction.fields.getTextInputValue('hobbiesInput');
+        await modalInteraction.update({ content: `${favoriteColor}\n${hobbies}` });
     }
 }
 export default ModalButton;

@@ -36,7 +36,7 @@ class InteractionCreate extends Event {
         } else if (interaction.isModalSubmit()) { // modals
             const { customId } = interaction;
             const modal = interaction.client.getModal(customId);
-            await modal.run(interaction);
+            await modal?.run(interaction);
         } else if (interaction.isAutocomplete()) { // autocomplete
             const { commandName } = interaction;
             const command = interaction.client.getSlashCommand(commandName);

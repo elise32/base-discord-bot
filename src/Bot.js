@@ -123,18 +123,12 @@ class Bot extends Client {
     /**
      * Retrieves the modal that matches the given name (which should match the customId).
      * @param {string} modalName The name matching the Modal.name field
-     * @returns {Modal} The modal that has a name matching modalName
+     * @returns {?Modal} The modal that has a name matching modalName
      */
     getModal(modalName) {
         const modal = this.#modals.get(modalName);
 
-        if (!modal) {
-            throw new LookupError(
-                `Tried to lookup modal with name '${modalName}' but it was not found!`,
-                modalName,
-                this.#modals,
-            );
-        }
+        // don't need to ensure there was a result because modals can be ran while not being in the bot's list
 
         return modal;
     }
