@@ -2,10 +2,11 @@
   "name": "base-discord-bot",
   "version": "1.0.0",
   "description": "",
-  "main": "./src/index.js",
+  "main": "./dist/index.js",
   "scripts": {
-    "start": "node ./src/index.js",
-    "reg": "node ./src/index.js -r"
+    "start": "node ./dist/index.js",
+    "reg": "node ./dist/index.js -r",
+    "build": "tsc -p ."
   },
   "repository": {
     "type": "git",
