@@ -1,20 +1,26 @@
-import { SlashCommandSubcommandBuilder, EmbedBuilder } from 'discord.js';
-import SubCommand from '../../Subcommand.js';
+import {
+    ChatInputCommandInteraction,
+    EmbedBuilder,
+    SlashCommandSubcommandBuilder,
+} from 'discord.js';
+
+import Bot from '../../../../Bot.js';
+import Subcommand from '../../Subcommand.js';
 
 /**
  * Handler for Embed subcommand. Makes an embed to demonstrate embed creation
  */
-class Embed extends SubCommand {
+class Embed extends Subcommand {
     /**
-     * @param {string} name The name of this subcommand
+     * @param client The Discord client
+     * @param name The name of this subcommand
      */
-    constructor(name = 'embed') {
-        super(name);
+    constructor(client: Bot, name = 'embed') {
+        super(client, name);
     }
 
     /**
-     * @returns {SlashCommandSubcommandBuilder} The data that describes the command format to the
-     *     Discord API
+     * @returns The data that describes the command format to the Discord API
      */
     getData() {
         return new SlashCommandSubcommandBuilder()
@@ -24,10 +30,9 @@ class Embed extends SubCommand {
 
     /**
      * Method to run when this subcommand is executed
-     * @param {ChatInputCommandInteraction} interaction The interaction that was emitted when the
-     *     slash command was executed
+     * @param interaction The interaction that was emitted when the slash command was executed
      */
-    async run(interaction) {
+    async run(interaction: ChatInputCommandInteraction) {
         // courtesy of https://discordjs.guide/popular-topics/embeds.html
         const exampleEmbed = new EmbedBuilder()
             .setColor(0x0099FF)

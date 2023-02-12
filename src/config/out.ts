@@ -1,14 +1,14 @@
 import config from './config.js';
 
-function debug(...args) {
+function debug(...args: unknown[]) {
     if (config.debug) {
-        config.debugOut(...args);
+        console.debug(...args);
     }
 }
 
-function verbose(...args) {
+function verbose(...args: unknown[]) {
     if (config.verbose) {
-        config.verboseOut(...args);
+        console.info(...args);
     }
 }
 

@@ -1,4 +1,6 @@
-import { SlashCommandBuilder } from 'discord.js';
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+
+import Bot from '../../../../Bot.js';
 import SlashCommand from '../../SlashCommand.js';
 
 /**
@@ -7,10 +9,11 @@ import SlashCommand from '../../SlashCommand.js';
  */
 class CoolPing extends SlashCommand {
     /**
-     * @param {string} name The name of this slash command
+     * @param client The Discord client
+     * @param name The name of this slash command
      */
-    constructor(name = 'coolping') {
-        super(name);
+    constructor(client: Bot, name = 'coolping') {
+        super(client, name);
     }
 
     /**
@@ -41,9 +44,9 @@ class CoolPing extends SlashCommand {
      * @param {ChatInputCommandInteraction} interaction The interaction that was emitted when this
      *     slash command was executed
      */
-    async run(interaction) {
+    async run(interaction: ChatInputCommandInteraction) {
         // get options (options can only be retrieved once)
-        const ephemeralChoice = interaction.options.getBoolean('ephemeral');
+        const ephemeralChoice = interaction.options.getBoolean('ephemeral', true);
         const deferTime = interaction.options.getInteger('defer-time');
         const editText = interaction.options.getString('edit-text');
         const followUpText = interaction.options.getString('follow-up-text');
@@ -55,7 +58,7 @@ class CoolPing extends SlashCommand {
 
             // eslint-disable-next-line no-promise-executor-return
             await new Promise((r) => setTimeout(r, deferTime));
-            await interaction.editReply({ content: 'Pong!', ephemeral: ephemeralChoice });
+            await interaction.editReply({ content: 'Pong!' });
         } else {
             await interaction.reply({ content: 'Pong!', ephemeral: ephemeralChoice });
         }

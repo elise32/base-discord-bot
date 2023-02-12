@@ -1,9 +1,11 @@
+import { APIModalInteractionResponseCallbackData, ModalBuilder } from 'discord.js';
+
 import TakesArguments from './TakesArguments.js';
 
 /**
  * Parent class for modal interaction handlers.
  */
-class Modal extends TakesArguments {
+export default abstract class Modal
+    extends TakesArguments<APIModalInteractionResponseCallbackData> {
+    abstract override getData(): ModalBuilder;
 }
-
-export default Modal;

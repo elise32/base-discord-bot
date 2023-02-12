@@ -1,5 +1,7 @@
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import fs from 'fs';
-import { SlashCommandBuilder } from 'discord.js';
+
+import Bot from '../../../../Bot.js';
 import SlashCommand from '../../SlashCommand.js';
 
 /**
@@ -7,10 +9,11 @@ import SlashCommand from '../../SlashCommand.js';
  */
 class Version extends SlashCommand {
     /**
-     * @param {string} name The name of this slash command
+     * @param client The Discord client
+     * @param name The name of this slash command
      */
-    constructor(name = 'version') {
-        super(name);
+    constructor(client: Bot, name = 'version') {
+        super(client, name);
     }
 
     /**
@@ -24,14 +27,16 @@ class Version extends SlashCommand {
 
     /**
      * Method to run when this slash command is executed
-     * @param {ChatInputCommandInteraction} interaction The interaction that was emitted when this
+     * @param interaction The interaction that was emitted when this
      *     slash command was executed
      */
-    async run(interaction) {
-        const data = JSON.parse(await fs.promises.readFile('./package.json'));
+    async run(interaction: ChatInputCommandInteraction) {
+        const data = JSON.parse(
+            (await fs.promises.readFile('./package.json')).toString(),
+        ) as { version?: string };
 
         await interaction.reply({
-            content: `Current version is ${data?.version ?? 'unknown'}`,
+            content: `Current version is ${data.version ?? 'unknown'}`,
             ephemeral: true,
         });
     }

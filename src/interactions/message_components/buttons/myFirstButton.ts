@@ -1,4 +1,6 @@
-import { ButtonBuilder, ButtonStyle } from 'discord.js';
+import { ButtonBuilder, ButtonInteraction, ButtonStyle } from 'discord.js';
+
+import Bot from '../../../Bot.js';
 import Button from '../Button.js';
 
 /**
@@ -6,17 +8,18 @@ import Button from '../Button.js';
  */
 class MyFirstButton extends Button {
     /**
-     * @param {string} name The name to use to identify this button and to serve as its customId.
-     *     Must be unique.
+     * @param client The Discord client
+     * @param name The name to use to identify this button and to serve as its customId. Must be
+     *     unique.
      */
-    constructor(name = 'myFirstButton') {
-        super(name);
+    constructor(client: Bot, name = 'myFirstButton') {
+        super(client, name);
     }
 
     /**
-     * @returns {ButtonBuilder} The data that describes the button format to the Discord API.
+     * @returns The data that describes the button format to the Discord API.
      */
-    getData() {
+    getData(): ButtonBuilder {
         return new ButtonBuilder()
             .setCustomId(this.name)
             .setLabel('Ding!')
@@ -26,10 +29,9 @@ class MyFirstButton extends Button {
 
     /**
      * Method to run when this button is pressed
-     * @param {ButtonInteraction} interaction The interaction that was emitted when this slash
-     *     command was executed
+     * @param interaction The interaction that was emitted when this slash command was executed
      */
-    async run(interaction) {
+    async run(interaction: ButtonInteraction) {
         await interaction.update({ content: 'and...' });
         await interaction.editReply({ content: 'Dong!', components: [] });
     }

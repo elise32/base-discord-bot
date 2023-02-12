@@ -1,4 +1,6 @@
-import { Events } from 'discord.js';
+import { Client, Events } from 'discord.js';
+
+import Bot from '../Bot.js';
 import Event from '../Event.js';
 
 /**
@@ -7,15 +9,19 @@ import Event from '../Event.js';
  */
 class Ready extends Event {
     /**
-     * @param {Client} client The Discord Client that will handle this interaction
-     * @param {String} name The name of this interaction
+     * @param client The Discord Client that will handle the event
+     * @param name The name of the event
      */
-    constructor(client, name = Events.ClientReady) {
+    constructor(client: Bot, name: Events = Events.ClientReady) {
         super(client, name);
     }
 
-    async run() {
-        console.log(`Logged in as ${this.client.user.tag}`);
+    /**
+     * @param client The client that became ready
+     */
+    // eslint-disable-next-line @typescript-eslint/require-await
+    override async run(client: Client<true>) {
+        console.log(`Logged in as ${client.user.tag}`);
     }
 }
 

@@ -1,21 +1,23 @@
-import { SlashCommandSubcommandBuilder } from 'discord.js';
-import SubCommand from '../../Subcommand.js';
+import { ChatInputCommandInteraction, SlashCommandSubcommandBuilder } from 'discord.js';
+
+import Bot from '../../../../Bot.js';
+import Subcommand from '../../Subcommand.js';
 
 /**
  * Handler for modal subcommand. Creates a message with a modal to demonstrate this project's modal
  * handling.
  */
-class ModalSubcommand extends SubCommand {
+class ModalSubcommand extends Subcommand {
     /**
-     * @param {string} name The name of this subcommand
+     * @param client The Discord client
+     * @param name The name of this subcommand
      */
-    constructor(name = 'modal') {
-        super(name);
+    constructor(client: Bot, name = 'modal') {
+        super(client, name);
     }
 
     /**
-     * @returns {SlashCommandSubcommandBuilder} The data that describes the command format to the
-     *     Discord API
+     * @returns The data that describes the command format to the Discord API
      */
     getData() {
         return new SlashCommandSubcommandBuilder()
@@ -25,11 +27,10 @@ class ModalSubcommand extends SubCommand {
 
     /**
      * Method to run when this subcommand is executed
-     * @param {ChatInputCommandInteraction} interaction The interaction that was emitted when the
-     *     slash command was executed
+     * @param interaction The interaction that was emitted when the slash command was executed
      */
-    async run(interaction) {
-        await interaction.showModal(interaction.client.getModal('myFirstModal'));
+    async run(interaction: ChatInputCommandInteraction) {
+        await interaction.showModal(this.client.getModal('myFirstModal'));
     }
 }
 

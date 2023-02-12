@@ -1,47 +1,63 @@
+/* eslint-disable max-classes-per-file */
+import {
+    AnyComponentBuilder,
+    APIButtonComponent,
+    APIModalInteractionResponseCallbackData,
+    APISelectMenuComponent,
+} from 'discord.js';
+
 import Interaction from './Interaction.js';
+
+export type TakesArgumentsJSONType =
+    | APIButtonComponent
+    | APISelectMenuComponent
+    | APIModalInteractionResponseCallbackData
 
 const delim = '|';
 
 /**
  * A class that has a need to store arguments to be parsed later.
  */
-class TakesArguments extends Interaction {
+export default abstract class TakesArguments<JSONEncoding extends TakesArgumentsJSONType>
+    extends Interaction<JSONEncoding> {
     /**
      * Joins the arguments together with a delimiter
-     * @param  {...any} args The elements to join
-     * @returns {string} The arguments joined with the delimiter
+     * @param args The elements to join
+     * @returns The arguments joined with the delimiter
      */
-    static delimit(...args) {
+    static delimit(...args: unknown[]): string {
         return args.join(delim);
     }
 
     /**
      * Tokenizes a delimited string
-     * @param {string} string A delimited string
-     * @returns {Array<string>} An array containing each token
+     * @param string A delimited string
+     * @returns An array containing each token
      */
-    static tokenize(string) {
+    static tokenize(string: string): string[] {
         return string.split(delim);
     }
 
     /**
      * Adds arguments to a builder
-     * @param {ComponentBuilder|ModalBuilder} builder The builder to add arguments to
-     * @param  {...any} args The arguments to add
-     * @returns {ComponentBuilder|ModalBuilder} The builder with the arguments added
+     * @param builder The builder to add arguments to
+     * @param args The arguments to add
+     * @returns The builder with the arguments added
      */
-    static addArgs(builder, ...args) {
-        return builder.setCustomId(TakesArguments.delimit(builder.data.custom_id, ...args));
+    static addArgs<
+        T extends AnyComponentBuilder & { data: { custom_id: string } }
+    >(builder: T, ...args: unknown[]): T {
+        return builder.setCustomId(TakesArguments.delimit(builder.data.custom_id, ...args)) as T;
     }
+
+    abstract override getData(): AnyComponentBuilder;
 
     /**
      * Creates a version of this instance's data with arguments added in.
-     * @param  {...any} args Arguments to add on to the data
+     * @param args Arguments to add on to the data
      * @returns The data with the arguments added in
      */
-    addArgs(...args) {
+    addArgs(...args: unknown[]): AnyComponentBuilder {
         return TakesArguments.addArgs(this.getData(), ...args);
     }
 }
-
-export default TakesArguments;

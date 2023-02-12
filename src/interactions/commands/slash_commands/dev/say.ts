@@ -1,21 +1,29 @@
-import { SlashCommandBuilder } from 'discord.js';
-import SlashCommand from '../../SlashCommand.js';
+import {
+    AutocompleteInteraction,
+    ChatInputCommandInteraction,
+    SlashCommandBuilder,
+} from 'discord.js';
+
+import Bot from '../../../../Bot.js';
+import Interaction from '../../../Interaction.js';
+import Autocompletable from '../../Autocompletable.js';
 
 /**
  * Handler for say slash command. Sends a message with the given input
  */
-class Say extends SlashCommand {
+class Say extends Autocompletable {
     /**
-     * @param {string} name The name of this slash command
+     * @param client The Discord client
+     * @param name The name of this slash command
      */
-    constructor(name = 'say') {
-        super(name);
+    constructor(client: Bot, name = 'say') {
+        super(client, name);
     }
 
     /**
-     * @returns {SlashCommandBuilder} The data that describes the command format to the Discord API
+     * @returns The data that describes the command format to the Discord API
      */
-    getData() {
+    override getData() {
         return new SlashCommandBuilder()
             .setName(this.name)
             .setDescription('Sends a message with the given input')
@@ -31,9 +39,9 @@ class Say extends SlashCommand {
 
     /**
      * Handler for autocompletion of an option
-     * @param {AutocompleteInteraction} interaction The interaction to autocomplete
+     * @param interaction The interaction to autocomplete
      */
-    async autocomplete(interaction) {
+    override async autocomplete(interaction: AutocompleteInteraction) {
         const focusedValue = interaction.options.getFocused();
         // three options
         const choices = ['Interaction', 'None', 'Enter message id:'];
@@ -41,7 +49,8 @@ class Say extends SlashCommand {
         // if the user has typed anything, either show only the message id prompt or everything but
         // the message id prompt
         if (focusedValue.length > 0) {
-            const msgIdOption = choices.pop();
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const msgIdOption: string = choices.pop()!;
             if (/^\d+$/.test(focusedValue)) { // test if string contains only numbers
                 await interaction.respond(
                     [{ name: msgIdOption, value: focusedValue }],
@@ -60,36 +69,55 @@ class Say extends SlashCommand {
 
     /**
      * Method to run when this slash command is executed
-     * @param {ChatInputCommandInteraction} interaction The interaction that was emitted when this
-     *     slash command was executed
+     * @param interaction The interaction that was emitted when this slash command was executed
      */
-    async run(interaction) {
-        const message = interaction.options.getString('message').replace('\\n', '\n');
-        const ephemeral = interaction.options.getBoolean('ephemeral');
+    override async run(interaction: ChatInputCommandInteraction) {
+        const message = interaction.options.getString('message', true).replace('\\n', '\n');
+        const ephemeral = interaction.options.getBoolean('ephemeral') ?? false;
 
         // if ephemeral is true, override the replyto choice with 'Interaction'
-        const replyto = ephemeral ? 'Interaction' : interaction.options.getString('replyto');
+        const replyTo = ephemeral ? 'Interaction' : interaction.options.getString('replyto', true);
 
         // send the message according to the parameters
-        if (replyto === 'Interaction') {
+        if (replyTo === 'Interaction') {
             await interaction.reply({ content: message, ephemeral });
-        } else if (!replyto || replyto === 'None') {
-            await interaction.channel.send(message);
+        } else if (!replyTo || replyTo === 'None') {
+            const channel = await Interaction.resolveChannel(interaction, this.client);
+
+            if (!channel) {
+                await interaction.reply({
+                    content: 'Unable to resolve channel for the reply',
+                    ephemeral: true,
+                });
+                return;
+            }
+
+            await channel.send(message);
             await interaction.reply('Sent!');
-        } else if (/^\d+$/.test(replyto)) { // replyto consists of only numbers, which we interpret as a message id
+        } else if (/^\d+$/.test(replyTo)) { // replyTo consists of only numbers, which we interpret as a message id
+            const channel = await Interaction.resolveChannel(interaction, this.client);
+
+            if (!channel) {
+                await interaction.reply({
+                    content: 'Unable to resolve channel for the reply',
+                    ephemeral: true,
+                });
+                return;
+            }
+
             try {
-                const msgToReplyTo = await interaction.channel.messages.fetch(replyto);
+                const msgToReplyTo = await channel.messages.fetch(replyTo);
                 await msgToReplyTo.reply(message);
                 await interaction.reply('Sent!');
             } catch {
                 await interaction.reply({
-                    content: `Message not found in this channel for id ${replyto}.`,
+                    content: `Message not found in this channel for id ${replyTo}.`,
                     ephemeral: true,
                 });
             }
         } else {
             await interaction.reply({
-                content: `Invalid input '${replyto}' for replyto. Should be one of the options or a message id.`,
+                content: `Invalid input '${replyTo}' for replyto. Should be one of the options or a message id.`,
                 ephemeral: true,
             });
         }

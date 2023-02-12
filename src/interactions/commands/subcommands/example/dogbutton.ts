@@ -1,27 +1,33 @@
-import { setTimeout as wait } from 'node:timers/promises';
 import {
-    SlashCommandSubcommandBuilder,
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
+    ChatInputCommandInteraction,
+    CollectedInteraction,
+    MessageActionRowComponentBuilder,
+    SlashCommandSubcommandBuilder,
 } from 'discord.js';
-import SubCommand from '../../Subcommand.js';
+import { setTimeout as wait } from 'node:timers/promises';
+
+import Bot from '../../../../Bot.js';
+import Interaction from '../../../Interaction.js';
+import Subcommand from '../../Subcommand.js';
 
 /**
  * Handler for dogbutton subcommand. Example for monolithically creating an example button,
  * receiving button presses, and handling the button press(es).
  */
-class dogbutton extends SubCommand {
+class DogButton extends Subcommand {
     /**
-     * @param {string} name The name of this subcommand
+     * @param client The Discord client
+     * @param name The name of this subcommand
      */
-    constructor(name = 'dogbutton') {
-        super(name);
+    constructor(client: Bot, name = 'dogbutton') {
+        super(client, name);
     }
 
     /**
-     * @returns {SlashCommandSubcommandBuilder} The data that describes the command format to the
-     *     Discord API
+     * @returns The data that describes the command format to the Discord API
      */
     getData() {
         return new SlashCommandSubcommandBuilder()
@@ -31,25 +37,23 @@ class dogbutton extends SubCommand {
 
     /**
      * Method to run when this subcommand is executed
-     * @param {ChatInputCommandInteraction} interaction The interaction that was emitted when the
-     *     slash command was executed
+     * @param interaction The interaction that was emitted when the slash command was executed
      */
-    async run(interaction) {
-        // make button
-        const row = new ActionRowBuilder()
-            .addComponents(
-                new ButtonBuilder()
-                    .setCustomId('primary')
-                    .setLabel('​') // zero width space so emoji is centered
-                    .setStyle(ButtonStyle.Primary)
-                    // .setDisabled(true)
-                    .setEmoji('1000617650419929120'),
-            );
-
+    async run(interaction: ChatInputCommandInteraction) {
         // make filter for collector and make collector
-        const filter = (i) => i.customId === 'primary' && i.user.id === '274206665241395202';
+        const channel = await Interaction.resolveChannel(interaction, this.client);
+        if (!channel) {
+            await interaction.reply({
+                content: 'Unable to resolve channel for this interaction',
+                ephemeral: true,
+            });
+            return;
+        }
 
-        const collector = interaction.channel.createMessageComponentCollector(
+        const filter = (i: CollectedInteraction) => i.customId === 'primary'
+            && i.user.id === '274206665241395202';
+
+        const collector = channel.createMessageComponentCollector(
             { filter, time: 15000 },
         );
 
@@ -62,8 +66,18 @@ class dogbutton extends SubCommand {
         collector.on('end', (collected) => console.log(`Collected ${collected.size} items`));
 
         // make message
+        // make button
+        const row = new ActionRowBuilder<MessageActionRowComponentBuilder>()
+            .addComponents(
+                new ButtonBuilder()
+                    .setCustomId('primary')
+                    .setLabel('​') // zero width space so emoji is centered
+                    .setStyle(ButtonStyle.Primary)
+                    // .setDisabled(true)
+                    .setEmoji('1000617650419929120'), // dog wave emoji
+            );
         await interaction.reply({ content: 'Dogge', ephemeral: true, components: [row] });
     }
 }
 
-export default dogbutton;
+export default DogButton;

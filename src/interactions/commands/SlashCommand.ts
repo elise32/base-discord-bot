@@ -1,16 +1,14 @@
-import Interaction from '../Interaction.js';
+import { SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js';
+
+import ApplicationCommand from './ApplicationCommand.js';
 
 /**
  * Parent class for slash command handlers.
  */
-class SlashCommand extends Interaction {
-    constructor(name, guild = null) {
-        super(name);
-
-        if (guild) {
-            this.guild = guild;
-        }
-    }
+abstract class SlashCommand extends ApplicationCommand {
+    abstract override getData():
+        Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'>
+        | SlashCommandSubcommandsOnlyBuilder;
 }
 
 export default SlashCommand;

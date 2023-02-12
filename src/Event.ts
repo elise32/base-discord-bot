@@ -1,30 +1,28 @@
+import Bot from './Bot.js';
+import Handler from './Handler.js';
+
 /**
  * Parent class for events. Subclasses should have a run function, which is called when the event is
  * triggered.
  */
-class Event {
-    client;
-
-    name;
-
+abstract class Event extends Handler {
     #listener;
 
     /**
-     * @param {Client} client The Discord Client
-     * @param {string} name The name of the event
+     * @param client The Discord Client
+     * @param name The name of the event
      */
-    constructor(client, name) {
-        this.client = client;
-        this.name = name;
+    constructor(client: Bot, name: string) {
+        super(client, name);
         this.#listener = this.#run.bind(this);
     }
 
     /**
      * Run the run function (should be implemented in subclasses) with given arguments as well as
      * catch and log errors.
-     * @param  {...any} args The arguments of the event
+     * @param args The arguments of the event
      */
-    async #run(...args) {
+    async #run(...args: unknown[]) {
         try {
             await this.run(...args);
         } catch (error) {
@@ -36,7 +34,7 @@ class Event {
      * Adds this this instance's listener function to the listener array of this.client for the
      * event named this.name
      */
-    startListener() {
+    startListener(): void {
         this.client.on(this.name, this.#listener);
     }
 
@@ -44,7 +42,7 @@ class Event {
      * Adds a one-time listener function to this.client for the event named this.name. The next time
      * the event is triggered, the client removes and then invokes this listener.
      */
-    listenOnce() {
+    listenOnce(): void {
         this.client.once(this.name, this.#listener);
     }
 
@@ -52,7 +50,7 @@ class Event {
      * Removes this instance's listener from this.client's listener array for the event named
      * this.name.
      */
-    stopListener() {
+    stopListener(): void {
         this.client.off(this.name, this.#listener);
     }
 }

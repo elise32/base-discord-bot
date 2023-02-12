@@ -1,29 +1,31 @@
-import { SelectMenuBuilder } from 'discord.js';
+import { StringSelectMenuBuilder, StringSelectMenuInteraction } from 'discord.js';
+
+import Bot from '../../../Bot.js';
 import SelectMenu from '../SelectMenu.js';
 
 /**
  * Handler for myFirstSelectMenu select menu. Example for select menus
  */
-class MyFirstSelectMenu extends SelectMenu {
+class MyFirstSelectMenu extends SelectMenu<string> {
     /**
-     * @param {string} name The name to use to identify this select menu and to serve as its
-     *     customId. Must be unique.
+     * @param client The Discord client
+     * @param name The name to use to identify this select menu and to serve as its customId. Must
+     *     be unique.
      */
-    constructor(name = 'myFirstSelectMenu') {
-        super(name);
+    constructor(client: Bot, name = 'myFirstSelectMenu') {
+        super(client, name);
     }
 
     /**
-     * @returns {SelectMenuBuilder} The data that describes the select menu format to the Discord
-     *     API.
+     * @returns The data that describes the select menu format to the Discord API.
      */
-    getData() {
-        return new SelectMenuBuilder()
+    getData(): StringSelectMenuBuilder {
+        return new StringSelectMenuBuilder()
             .setCustomId(this.name)
             .setPlaceholder('Nothing selected')
             .setMinValues(2)
             .setMaxValues(3)
-            .addOptions([
+            .addOptions(
                 {
                     label: 'Option 1',
                     description: 'Description 1',
@@ -39,15 +41,14 @@ class MyFirstSelectMenu extends SelectMenu {
                     description: 'Description the third',
                     value: 'third_option',
                 },
-            ]);
+            );
     }
 
     /**
      * Method to run when this select menu is used
-     * @param {SelectMenuInteraction} interaction The interaction that was emitted when this select
-     * menu was used
+     * @param interaction The interaction that was emitted when this select menu was used
      */
-    async run(interaction) {
+    async run(interaction: StringSelectMenuInteraction) {
         await interaction.update({ content: `You selected ${interaction.values.join(', ')}!` });
     }
 }

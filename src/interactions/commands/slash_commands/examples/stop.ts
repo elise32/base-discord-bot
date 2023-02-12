@@ -1,3 +1,4 @@
+import Bot from '../../../../Bot.js';
 import SlashCommandWithSubcommands from '../../SlashCommandWithSubcommands.js';
 
 /**
@@ -5,10 +6,11 @@ import SlashCommandWithSubcommands from '../../SlashCommandWithSubcommands.js';
  */
 class Stop extends SlashCommandWithSubcommands {
     /**
-     * @param {string} name The name of this slash command
+     * @param client The Discord client
+     * @param name The name of this slash command
      */
-    constructor(name = 'stop') {
-        super(name);
+    constructor(client: Bot, name = 'stop') {
+        super(client, name);
     }
 }
 

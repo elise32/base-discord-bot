@@ -1,4 +1,6 @@
-import { SlashCommandBuilder } from 'discord.js';
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+
+import Bot from '../../../../Bot.js';
 import SlashCommand from '../../SlashCommand.js';
 
 /**
@@ -8,16 +10,17 @@ import SlashCommand from '../../SlashCommand.js';
  */
 class Questionnaire extends SlashCommand {
     /**
-     * @param {string} name The name of this slash command
+     * @param client The Discord client
+     * @param name The name of this slash command
      */
-    constructor(name = 'questionnaire') {
-        super(name);
+    constructor(client: Bot, name = 'questionnaire') {
+        super(client, name);
     }
 
     /**
-     * @returns {SlashCommandBuilder} The data that describes the command format to the Discord API
+     * @returns The data that describes the command format to the Discord API
      */
-    getData() {
+    override getData() {
         // these options that encompass all option types
         return new SlashCommandBuilder()
             .setName(this.name)
@@ -35,10 +38,10 @@ class Questionnaire extends SlashCommand {
 
     /**
      * Method to run when this slash command is executed
-     * @param {ChatInputCommandInteraction} interaction The interaction that was emitted when this
+     * @param interaction The interaction that was emitted when this
      *     slash command was executed
      */
-    async run(interaction) {
+    override async run(interaction: ChatInputCommandInteraction) {
         // parse all options
         const string = interaction.options.getString('input');
         const boolean = interaction.options.getBoolean('bool');
@@ -51,10 +54,13 @@ class Questionnaire extends SlashCommand {
         const mentionable = interaction.options.getMentionable('mentionable');
         const attachment = interaction.options.getAttachment('attachment');
 
-        // log all the parsed result of all the options that were entered
-        console.log({
+        const answers = {
             string, boolean, user, member, channel, role, integer, number, mentionable, attachment,
-        });
+        };
+
+        // output all the parsed result of all the options that were entered
+        console.log(answers);
+        await interaction.reply({ content: Object.values(answers).join(', '), ephemeral: true });
     }
 }
 

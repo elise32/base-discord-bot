@@ -1,20 +1,37 @@
 import {
     ActionRowBuilder,
+    InteractionUpdateOptions,
+    Message,
+    MessagePayload,
+    ModalActionRowComponentBuilder,
     ModalBuilder,
+    ModalSubmitInteraction,
     TextInputBuilder,
     TextInputStyle,
 } from 'discord.js';
+
+import Bot from '../../Bot.js';
 import Modal from '../Modal.js';
+
+interface Updatable {
+    update: (options: string | MessagePayload | InteractionUpdateOptions) => Promise<Message | void>
+}
+
+function canUpdate(interaction: ModalSubmitInteraction)
+    : interaction is ModalSubmitInteraction & Updatable {
+    return 'update' in interaction;
+}
 
 /**
  * Handler for myFirstModal modal. Demonstration of modal handling.
  */
 class MyFirstModal extends Modal {
     /**
-     * @param {string} name The name of this modal
+     * @param client The Discord client
+     * @param name The name of this modal
      */
-    constructor(name = 'myFirstModal') {
-        super(name);
+    constructor(client: Bot, name = 'myFirstModal') {
+        super(client, name);
     }
 
     /**
@@ -26,7 +43,7 @@ class MyFirstModal extends Modal {
             .setCustomId(this.name)
             .setTitle('My Modal')
             .addComponents(
-                new ActionRowBuilder()
+                new ActionRowBuilder<ModalActionRowComponentBuilder>()
                     .addComponents(
                         new TextInputBuilder()
                             .setCustomId('favoriteColorInput')
@@ -38,7 +55,7 @@ class MyFirstModal extends Modal {
                             .setValue('Default')
                             .setRequired(true),
                     ),
-                new ActionRowBuilder()
+                new ActionRowBuilder<ModalActionRowComponentBuilder>()
                     .addComponents(
                         new TextInputBuilder()
                             .setCustomId('hobbiesInput')
@@ -50,10 +67,9 @@ class MyFirstModal extends Modal {
 
     /**
      * Method to run when this modal is submitted
-     * @param {ModalSubmitInteraction} interaction The interaction that was emitted when this modal
-     *     was submitted
+     * @param 1interaction The interaction that was emitted when this modal was submitted
      */
-    async run(interaction) {
+    async run(interaction: ModalSubmitInteraction) {
         const favoriteColor = interaction.fields.getTextInputValue('favoriteColorInput');
         const hobbies = interaction.fields.getTextInputValue('hobbiesInput');
 
@@ -62,7 +78,7 @@ class MyFirstModal extends Modal {
          * SelectMenuInteraction, the interaction will provide update() and deferUpdate(). We can
          * determine this by checking if message exists.
          */
-        if (interaction.message) {
+        if (canUpdate(interaction)) {
             await interaction.update({ content: `${favoriteColor}\n${hobbies}` });
         } else {
             await interaction.reply({ content: `${favoriteColor}\n${hobbies}`, ephemeral: true });

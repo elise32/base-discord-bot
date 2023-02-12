@@ -1,4 +1,10 @@
-import { ApplicationCommandType, ContextMenuCommandBuilder } from 'discord.js';
+import {
+    ApplicationCommandType,
+    ContextMenuCommandBuilder,
+    UserContextMenuCommandInteraction,
+} from 'discord.js';
+
+import Bot from '../../../Bot.js';
 import ContextMenuCommand from '../ContextMenuCommand.js';
 
 /**
@@ -6,17 +12,17 @@ import ContextMenuCommand from '../ContextMenuCommand.js';
  */
 class DisplayAvatar extends ContextMenuCommand {
     /**
-     * @param {string} name The name of this context menu command
+     * @param client The Discord client
+     * @param name The name of this context menu command
      */
-    constructor(name = 'Display Avatar') {
-        super(name);
+    constructor(client: Bot, name = 'Display Avatar') {
+        super(client, name);
     }
 
     /**
-     * @returns {ContextMenuCommandBuilder} The data that describe the command format to the Discord
-     *     API
+     * @returns The data that describe the command format to the Discord API
      */
-    getData() {
+    override getData() {
         return new ContextMenuCommandBuilder()
             .setName(this.name)
             .setType(ApplicationCommandType.User);
@@ -24,10 +30,9 @@ class DisplayAvatar extends ContextMenuCommand {
 
     /**
      * Method to run when this context menu command is executed
-     * @param {UserContextMenuCommandInteraction} interaction The interaction that was emitted when
-     *     this command was executed
+     * @param interaction The interaction that was emitted when this command was executed
      */
-    async run(interaction) {
+    override async run(interaction: UserContextMenuCommandInteraction) {
         await interaction.reply({
             content: `${interaction.user.username} wanted to see ${interaction.targetUser.displayAvatarURL()}`,
             ephemeral: true,

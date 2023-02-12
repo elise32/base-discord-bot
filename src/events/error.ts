@@ -1,4 +1,6 @@
 import { Events } from 'discord.js';
+
+import Bot from '../Bot.js';
 import Event from '../Event.js';
 
 /**
@@ -6,17 +8,18 @@ import Event from '../Event.js';
  */
 class Error extends Event {
     /**
-     * @param {Client} client The Discord Client that will handle this interaction
-     * @param {String} name The name of this interaction
+     * @param client The Discord client that will handle the event
+     * @param name The name of the event
      */
-    constructor(client, name = Events.Error) {
+    constructor(client: Bot, name: Events = Events.Error) {
         super(client, name);
     }
 
     /**
-     * @param {Error} error The error that was encountered
+     * @param error The error that was encountered
      */
-    async run(error) {
+    // eslint-disable-next-line @typescript-eslint/require-await
+    override async run(error: Error) {
         console.log('In error handler:');
         console.error(error);
     }

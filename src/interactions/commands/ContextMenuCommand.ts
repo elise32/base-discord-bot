@@ -1,16 +1,12 @@
-import Interaction from '../Interaction.js';
+import { ContextMenuCommandBuilder } from 'discord.js';
+
+import ApplicationCommand from './ApplicationCommand.js';
 
 /**
  * Parent class for context menu command interaction handlers.
  */
-class ContextMenuCommand extends Interaction {
-    constructor(name, guild = null) {
-        super(name);
-
-        if (guild) {
-            this.guild = guild;
-        }
-    }
+abstract class ContextMenuCommand extends ApplicationCommand {
+    abstract override getData(): ContextMenuCommandBuilder;
 }
 
 export default ContextMenuCommand;

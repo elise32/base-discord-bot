@@ -1,21 +1,27 @@
-import { ActionRowBuilder, SlashCommandSubcommandBuilder } from 'discord.js';
-import SubCommand from '../../Subcommand.js';
+import {
+    ActionRowBuilder,
+    ChatInputCommandInteraction,
+    SlashCommandSubcommandBuilder,
+} from 'discord.js';
+
+import Bot from '../../../../Bot';
+import Subcommand from '../../Subcommand.js';
 
 /**
  * Handler for modalviabutton subcommand. Creates a message with a button that shows a modal to
  * demonstrate the behavior of modals when they come from a message component.
  */
-class ModalViaButton extends SubCommand {
+class ModalViaButton extends Subcommand {
     /**
-     * @param {string} name The name of this subcommand
+     * @param client The Discord client
+     * @param name The name of this subcommand
      */
-    constructor(name = 'modalviabutton') {
-        super(name);
+    constructor(client: Bot, name = 'modalviabutton') {
+        super(client, name);
     }
 
     /**
-     * @returns {SlashCommandSubcommandBuilder} The data that describes the command format to the
-     *     Discord API
+     * @returns The data that describes the command format to the Discord API
      */
     getData() {
         return new SlashCommandSubcommandBuilder()
@@ -25,10 +31,9 @@ class ModalViaButton extends SubCommand {
 
     /**
      * Method to run when this subcommand is executed
-     * @param {ChatInputCommandInteraction} interaction The interaction that was emitted when the
-     *     slash command was executed
+     * @param interaction The interaction that was emitted when the slash command was executed
      */
-    async run(interaction) {
+    async run(interaction: ChatInputCommandInteraction) {
         const row = new ActionRowBuilder()
             .addComponents(interaction.client.getButton('modalButton'));
         await interaction.reply({ ephemeral: true, components: [row] });

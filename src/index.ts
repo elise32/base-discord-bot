@@ -1,20 +1,20 @@
-import Discord from 'discord.js';
+import { GatewayIntentBits } from 'discord.js';
 import yargs from 'yargs';
+
+import Bot, { BotStartOptions } from './Bot.js';
 import config from './config/config.js';
-import Bot from './Bot.js';
 import { FatalError } from './utils/errors.js';
 
-// create bot
-const client = new Bot({
-    intents: [
-        Discord.GatewayIntentBits.Guilds,
-        Discord.GatewayIntentBits.GuildMessages,
-        Discord.GatewayIntentBits.MessageContent,
-    ],
-});
+interface CLIArguments {
+    d?: boolean
+    v?: boolean
+    r?: boolean
+    c?: boolean
+    g?: string
+}
 
 // parse arguments
-const args = yargs(process.argv.slice(2))
+const args: CLIArguments = yargs(process.argv.slice(2))
     .options({
         d: {
             alias: 'debug',
@@ -41,27 +41,36 @@ const args = yargs(process.argv.slice(2))
             describe: 'Specify a guild to clean guild-specific commands from',
             type: 'string',
         },
-    }).argv;
+    })
+    .parseSync();
 const {
-    debug,
-    verbose,
-    register,
-    clean,
-    guild,
+    d: debug,
+    v: verbose,
+    r: register,
+    c: clean,
+    g: guild,
 } = args;
 
-config.debug = debug;
-config.verbose = verbose;
+config.debug = Boolean(debug);
+config.verbose = Boolean(verbose);
 
-const options = {
-    clean,
-    registerCommands: register,
+const options: BotStartOptions = {
+    clean: Boolean(clean),
+    registerCommands: Boolean(register),
     guildId: guild,
 };
 
-// start the bot
+// create and start the bot
+const bot = new Bot({
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent,
+    ],
+});
+
 try {
-    await client.start(config.token, options);
+    await bot.start(config.token, options);
 } catch (error) {
     /*
      * any error encountered during startup is considered fatal because they may place the bot in an

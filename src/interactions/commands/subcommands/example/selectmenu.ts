@@ -1,21 +1,28 @@
-import { ActionRowBuilder, SlashCommandSubcommandBuilder } from 'discord.js';
-import SubCommand from '../../Subcommand.js';
+import {
+    ActionRowBuilder,
+    ChatInputCommandInteraction,
+    SlashCommandSubcommandBuilder,
+} from 'discord.js';
+
+import Bot from '../../../../Bot.js';
+import SelectMenu from '../../../message_components/SelectMenu.js';
+import Subcommand from '../../Subcommand.js';
 
 /**
  * Handler for SelectMenu subcommand. Creates a message with a select menu to demonstrate this
  * project's select menu handling.
  */
-class SelectMenuSubcommand extends SubCommand {
+class SelectMenuSubcommand extends Subcommand {
     /**
-     * @param {string} name The name of this subcommand
+     * @param client The Discord client
+     * @param name The name of this subcommand
      */
-    constructor(name = 'selectmenu') {
-        super(name);
+    constructor(client: Bot, name = 'selectmenu') {
+        super(client, name);
     }
 
     /**
-     * @returns {SlashCommandSubcommandBuilder} The data that describes the command format to the
-     *     Discord API
+     * @returns The data that describes the command format to the Discord API
      */
     getData() {
         return new SlashCommandSubcommandBuilder()
@@ -25,11 +32,10 @@ class SelectMenuSubcommand extends SubCommand {
 
     /**
      * Method to run when this subcommand is executed
-     * @param {ChatInputCommandInteraction} interaction The interaction that was emitted when the
-     *     slash command was executed
+     * @param interaction The interaction that was emitted when the slash command was executed
      */
-    async run(interaction) {
-        const row = new ActionRowBuilder()
+    async run(interaction: ChatInputCommandInteraction) {
+        const row = new ActionRowBuilder()<SelectMenu>()
             .addComponents(interaction.client.getSelectMenu('myFirstSelectMenu'));
         await interaction.reply({ content: 'Select!', ephemeral: true, components: [row] });
     }

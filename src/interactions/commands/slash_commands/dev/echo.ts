@@ -1,4 +1,6 @@
-import { SlashCommandBuilder } from 'discord.js';
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+
+import Bot from '../../../../Bot.js';
 import SlashCommand from '../../SlashCommand.js';
 
 /**
@@ -7,16 +9,17 @@ import SlashCommand from '../../SlashCommand.js';
  */
 class Echo extends SlashCommand {
     /**
-     * @param {string} name The name of this slash command
+     * @param client The Discord client
+     * @param name The name of this slash command
      */
-    constructor(name = 'echo') {
-        super(name);
+    constructor(client: Bot, name = 'echo') {
+        super(client, name);
     }
 
     /**
-     * @returns {SlashCommandBuilder} The data that describes the command format to the Discord API
+     * @returns The data that describes the command format to the Discord API
      */
-    getData() {
+    override getData() {
         return new SlashCommandBuilder()
             .setName(this.name)
             .setDescription('Repeats the input back at you!')
@@ -27,11 +30,10 @@ class Echo extends SlashCommand {
 
     /**
      * Method to run when this slash command is executed
-     * @param {ChatInputCommandInteraction} interaction The interaction that was emitted when this
-     *     slash command was executed
+     * @param interaction The interaction that was emitted when this slash command was executed
      */
-    async run(interaction) {
-        const message = interaction.options.getString('message');
+    override async run(interaction: ChatInputCommandInteraction) {
+        const message = interaction.options.getString('message', true);
         await interaction.reply({ content: message.replace('\\n', '\n'), ephemeral: true });
     }
 }

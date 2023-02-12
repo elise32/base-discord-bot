@@ -1,6 +1,9 @@
-import { Events } from 'discord.js';
+import { BaseInteraction, Events } from 'discord.js';
+
+import Bot from '../Bot.js';
 import { verbose } from '../config/out.js';
 import Event from '../Event.js';
+import Autocompletable from '../interactions/commands/Autocompletable.js';
 import TakesArguments from '../interactions/TakesArguments.js';
 
 /**
@@ -8,60 +11,70 @@ import TakesArguments from '../interactions/TakesArguments.js';
  */
 class InteractionCreate extends Event {
     /**
-     * @param {Client} client The Discord Client that will handle this interaction
-     * @param {String} name The name of this interaction
+     * @param client The Discord client that will handle the event
+     * @param name The name of the event
      */
-    constructor(client, name = Events.InteractionCreate) {
+    constructor(client: Bot, name: Events = Events.InteractionCreate) {
         super(client, name);
     }
 
     /**
      * Looks up the interaction from the interaction's client and runs it.
-     * @param {Interaction} interaction The interaction whose creation triggered this event
+     * @param interaction The interaction whose creation triggered this event
      */
-    async run(interaction) {
+    override async run(interaction: BaseInteraction) {
         if (interaction.isChatInputCommand()) { // slash commands
             const { commandName } = interaction;
-            const command = interaction.client.getSlashCommand(commandName);
+            const command = this.client.getSlashCommand(commandName);
 
             verbose(`${interaction.user.tag} ran slash command ${commandName}, options:`, interaction.options.data);
 
             await command.run(interaction);
         } else if (interaction.isContextMenuCommand()) { // context menu commands
             const { commandName } = interaction;
-            const command = interaction.client.getContextMenuCommand(commandName);
+            const command = this.client.getContextMenuCommand(commandName);
 
-            verbose(`${interaction.user.tag} ran context menu command ${commandName}, target:`, interaction.targetUser ?? interaction.targetMessage);
+            if (interaction.isUserContextMenuCommand()) {
+                verbose(`${interaction.user.tag} ran context menu command ${commandName}, target user:`, interaction.targetUser);
+            } else if (interaction.isMessageContextMenuCommand()) {
+                verbose(`${interaction.user.tag} ran context menu command ${commandName}, target message:`, interaction.targetMessage);
+            } else {
+                verbose(`${interaction.user.tag} ran context menu command ${commandName}, target unknown`);
+            }
 
             await command.run(interaction);
         } else if (interaction.isButton()) { // buttons
             const [customId, ...args] = TakesArguments.tokenize(interaction.customId);
-            const button = interaction.client.getButton(customId);
+            const button = this.client.getButton(customId);
 
             verbose(`${interaction.user.tag} ran button ${customId}, args:`, args);
 
             await button.run(interaction, ...args);
-        } else if (interaction.isSelectMenu()) { // select menus
+        } else if (interaction.isAnySelectMenu()) { // select mens
             const [customId, ...args] = TakesArguments.tokenize(interaction.customId);
-            const selectMenu = interaction.client.getSelectMenu(customId);
+            const selectMenu = this.client.getSelectMenu(customId);
 
             verbose(`${interaction.user.tag} ran select menu ${customId}, args:`, args, ', values:', interaction.values);
 
             await selectMenu.run(interaction, ...args);
         } else if (interaction.isModalSubmit()) { // modals
             const [customId, ...args] = TakesArguments.tokenize(interaction.customId);
-            const modal = interaction.client.getModal(customId);
+            const modal = this.client.getModal(customId);
 
             verbose(`${interaction.user.tag} ran modal submit ${customId}, args:`, args, ', values:', interaction.fields.fields);
 
             await modal.run(interaction, ...args);
         } else if (interaction.isAutocomplete()) { // autocomplete
             const { commandName } = interaction;
-            const command = interaction.client.getSlashCommand(commandName);
+            const command = this.client.getSlashCommand(commandName);
 
             verbose(`${interaction.user.tag} ran autocomplete for command ${commandName}: ${interaction.options.getFocused()}`);
 
-            command.autocomplete(interaction);
+            if (!(command instanceof Autocompletable)) {
+                throw new TypeError('Command that received autocomplete interaction was not an Autocompletable');
+            }
+
+            await command.autocomplete(interaction);
         }
     }
 }

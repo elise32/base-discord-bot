@@ -1,4 +1,7 @@
 import 'dotenv/config';
+
+import { Snowflake } from 'discord.js';
+
 import { FatalError } from '../utils/errors.js';
 
 // for easier reading
@@ -6,28 +9,31 @@ import { FatalError } from '../utils/errors.js';
 /**
  * @property {boolean}   debug      - Whether debug mode is enabled
  * @property {boolean}   verbose    - Whether verbose output is enabled
- * @property {function}  debugOut   - Function to be called for debug output
- * @property {function}  verboseOut - Function to be called for verbose output
  * @property {Snowflake} clientId   - The id of the bot to which application commands are registered, in the form of a Discord Snowflake
  * @property {string}    token      - The token of the bot
  */
-const config = {
+interface Config {
+    debug: boolean;
+    verbose: boolean;
+    clientId: Snowflake;
+    token: string;
+}
+
+if (typeof process.env.TOKEN !== 'string') {
+    throw new FatalError('Value was not provided for environmental variable TOKEN');
+}
+
+const config: Config = {
     debug: false,
     verbose: false,
-    debugOut: () => { },
-    verboseOut: () => { },
     clientId: '1003943782913417267',
     token: process.env.TOKEN,
 };
 
 const development = {
-    debugOut: console.debug,
-    verboseOut: console.info,
 };
 
 const production = {
-    debugOut: () => { },
-    verboseOut: () => { },
 };
 
 if (process.env.NODE_ENV === 'development') {

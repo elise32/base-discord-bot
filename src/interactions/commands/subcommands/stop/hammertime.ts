@@ -1,4 +1,6 @@
-import { SlashCommandSubcommandBuilder } from 'discord.js';
+import { ChatInputCommandInteraction, SlashCommandSubcommandBuilder } from 'discord.js';
+
+import Bot from '../../../../Bot.js';
 import SubCommand from '../../Subcommand.js';
 
 /**
@@ -6,15 +8,15 @@ import SubCommand from '../../Subcommand.js';
  */
 class Hammertime extends SubCommand {
     /**
-     * @param {string} name The name of this subcommand
+     * @param client The Discord client
+     * @param name The name of this subcommand
      */
-    constructor(name = 'hammertime') {
-        super(name);
+    constructor(client: Bot, name = 'hammertime') {
+        super(client, name);
     }
 
     /**
-     * @returns {SlashCommandSubcommandBuilder} The data that describes the command format to the
-     *     Discord API
+     * @returns The data that describes the command format to the Discord API
      */
     getData() {
         return new SlashCommandSubcommandBuilder()
@@ -24,10 +26,9 @@ class Hammertime extends SubCommand {
 
     /**
      * Method to run when this subcommand is executed
-     * @param {ChatInputCommandInteraction} interaction The interaction that was emitted when the
-     *     slash command was executed
+     * @param interaction The interaction that was emitted when the slash command was executed
      */
-    async run(interaction) {
+    async run(interaction: ChatInputCommandInteraction) {
         await interaction.reply({ content: 'Stop, hammertime!', ephemeral: true });
     }
 }

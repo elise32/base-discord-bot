@@ -1,4 +1,6 @@
-import { SlashCommandBuilder } from 'discord.js';
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+
+import Bot from '../../../../Bot.js';
 import SlashCommand from '../../SlashCommand.js';
 
 /**
@@ -9,16 +11,17 @@ import SlashCommand from '../../SlashCommand.js';
  */
 class Ice extends SlashCommand {
     /**
-     * @param {string} name The name of this slash command
+     * @param client The Discord client
+     * @param name The name of this slash command
      */
-    constructor(name = 'ice') {
-        super(name);
+    constructor(client: Bot, name = 'ice') {
+        super(client, name);
     }
 
     /**
-     * @returns {SlashCommandBuilder} The data that describes the command format to the Discord API
+     * @returns The data that describes the command format to the Discord API
      */
-    getData() {
+    override getData() {
         return new SlashCommandBuilder()
             .setName(this.name)
             .setDescription('Never shown')
@@ -47,26 +50,22 @@ class Ice extends SlashCommand {
 
     /**
      * Method to run when this slash command is executed
-     * @param {ChatInputCommandInteraction} interaction The interaction that was emitted when this
-     *     slash command was executed
+     * @param interaction The interaction that was emitted when this slash command was executed
      */
-    async run(interaction) {
-        let message = '';
+    override async run(interaction: ChatInputCommandInteraction) {
+        let message = 'Default message';
         const groupName = interaction.options.getSubcommandGroup();
+        const subcommandName = interaction.options.getSubcommand();
         if (groupName) {
-            const subcommandName = interaction.options.getSubcommand();
             if (groupName === 'ice' && subcommandName === 'baby') {
-                const flavor = interaction.options.getString('flavor');
-                message += `Your ice is ${flavor} ice`;
+                const flavor = interaction.options.getString('flavor', true);
+                message = `Your ice is ${flavor} ice`;
             } else if (groupName === 'cream' && subcommandName === 'sandwich') {
-                message += 'You got an ice cream sandwich!';
+                message = 'You got an ice cream sandwich!';
             }
-        } else { // no subcommand group
-            const subcommandName = interaction.options.getSubcommand();
-            if (subcommandName === 'cold') {
-                const answer = interaction.options.getString('answer');
-                message += `${answer} is cooler than cool`;
-            }
+        } else if (subcommandName === 'cold') {
+            const answer = interaction.options.getString('answer', true);
+            message = `${answer} is cooler than cool`;
         }
 
         await interaction.reply({ content: message, ephemeral: true });
